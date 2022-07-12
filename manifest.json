@@ -1,31 +1,31 @@
 {
-    name: "Pi eCard",
-    short_name: "Pi eCard",
-    icons: [
+    "name": "Pi eCard",
+    "short_name": "Pi eCard",
+    "icons": [
         {
-        src: "./img/logo.png",
-        sizes: "100x100",
-        type: "image/png",
+            "src": "./img/logo.png",
+            "sizes": "100x100",
+            "type": "image/png"
         },
         {
-        src: "./img/logo.png",
-        sizes: "150x150",
-        type: "image/png",
+            "src": "./img/logo.png",
+            "sizes": "150x150",
+            "type": "image/png"
         },
         {
-        src: "./img/logo.png",
-        sizes: "250x250",
-        type: "image/png",
+            "src": "./img/logo.png",
+            "sizes": "250x250",
+            "type": "image/png"
         },
         {
-        src: "./img/logo.png",
-        sizes: "500x500",
-        type: "image/png",
-        },
+            "src": "./img/logo.png",
+            "sizes": "500x500",
+            "type": "image/png"
+        }
     ],
-    theme_color: "#b44afb",
-    background_color: "#FFFFFF",
-    start_url: "/Pi-eCard/",
-    display: "standalone",
-    orientation: "portrait",
-};
+    "theme_color": "#b44afb",
+    "background_color": "#FFFFFF",
+    "start_url": "/index.hmtl",
+    "display": "standalone",
+    "orientation": "portrait"
+}
