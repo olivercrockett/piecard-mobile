@@ -3,29 +3,19 @@
     "short_name": "Pi eCard",
     "icons": [
         {
-            "src": "./img/logo.png",
-            "sizes": "100x100",
+            "src": "./img/logo_128.png",
+            "sizes": "128x128",
             "type": "image/png"
         },
         {
-            "src": "./img/logo.png",
-            "sizes": "150x150",
-            "type": "image/png"
-        },
-        {
-            "src": "./img/logo.png",
-            "sizes": "250x250",
-            "type": "image/png"
-        },
-        {
-            "src": "./img/logo.png",
-            "sizes": "500x500",
+            "src": "./img/logo_512.png",
+            "sizes": "512x512",
             "type": "image/png"
         }
     ],
     "theme_color": "#b44afb",
     "background_color": "#FFFFFF",
-    "start_url": "/index.html",
+    "start_url": "./index.html",
     "display": "standalone",
     "orientation": "portrait"
 }
