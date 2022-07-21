@@ -256,6 +256,19 @@ function openLoginModal() {
   appLogin(username, password);
 }
 
+function openTranslate() {
+  document.getElementById("translateModal").classList.add("is-visible");
+  const tint = document.getElementById("darkTint");
+  tint.style.display = "block";
+  toggleMenu();
+}
+
+function closeTranslate() {
+  document.getElementById("translateModal").classList.remove("is-visible");
+  const tint = document.getElementById("darkTint");
+  tint.style.display = "none";
+}
+
 function toggleMenu() {
   const menu = document.getElementById("popup");
   const tint = document.getElementById("tint");

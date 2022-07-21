@@ -154,6 +154,7 @@ async function myProfile() {
         name.textContent = `please login`;
         document.getElementById("historySection").textContent =
           "please login to see your transactions";
+        document.getElementById("loadingHistoryWheel").style.display = "none";
       });
     if (response.status === 200) {
       balance.textContent = `${response.data.user.balance.toFixed(2)}`;
