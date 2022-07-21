@@ -148,6 +148,7 @@
   <div id="d" class="box" onclick="activeBox(d)">
     <h3 style="margin-bottom: 10px;">History</h3>
     <div id="historySection"></div>
+    <div id="loadingHistoryWheel" class="loader"></div><br>
   </div>
 
   <!--   Floating tab -->
@@ -158,6 +159,7 @@
     <a class="fa tab" onclick="location.href='/'">&#xf021;<i style="font-size: 15px; font-family: 'Fredoka', sans-serif; font-weight: normal">Refresh</i></a><br>
     <a class="fa tab fa-plus" style="color: black;" onclick="toggleMenu(); activeBox(c); location.href='#topupAmount';"><i style="font-size: 15px; font-family: 'Fredoka', sans-serif; font-weight: normal">Buy Pi</i></a><br>
     <a class="tab fas fa-file-invoice" onclick="openInvoices()"><i style="font-size: 15px; font-family: 'Fredoka', sans-serif; font-weight: normal">View outstanding invoices</i></a><br>
+    <a class="tab fa fa-language" aria-hidden="true" style="transform: translateX(-5px)" onclick="tranlate()"><i style="font-size: 15px; font-family: 'Fredoka', sans-serif; font-weight: normal">Translate page</i></a><br>
     <a class="tab fa-solid fa-share-nodes" onclick="refer()"><i style="font-size: 15px; font-family: 'Fredoka', sans-serif; font-weight: normal">Refer user</i></a><br>
     <a class="fa fa-sign-out tab" onclick="logout()" aria-hidden="true"><i style="font-size: 15px; font-family: 'Fredoka', sans-serif; font-weight: normal">Logout</i></a><br>
     <span id="error_log"></span>
@@ -209,7 +211,7 @@
           <i class="fas fa-copy" style="float: right;" onclick="navigator.clipboard.writeText(document.getElementById('urlTab').textContent);
   alert('Copied');"></i>
         </div><br><br><br>
-        <a>Click <span onclick="alert('feature coming soon...')" style="color: #5b4afb;">here</span> to see the progress of your outstanding invoices</a>
+        <a>Click <span onclick="openInvoices()" style="color: #5b4afb;">here</span> to see the progress of your outstanding invoices</a>
       </section>
     </div>
   </div>
@@ -266,7 +268,8 @@
           <img class="completeImg" src="/img/failed.png"></img>
         </div>
         <div id="confirmPaymentUsername">
-          <a id="confirmPaymentUsernameMessage"></a>
+          <a id="confirmPaymentUsernameMessage"></a><br><br>
+          <i id="confirmPaymentUsernameMessageFee"></i>
           <div style="display: flex; flex-direction: row; justify-content: space-between;">
             <button id="confirmPaymentUsernameBtn" onclick="payByUsername()">Yes</button>
             <button id="cancelPaymentUsernameBtn" onclick="cancelPayByUsername()">No</button>
@@ -306,6 +309,7 @@
       </header>
       <section class="modal-content">
         <div style="margin-top: -10px;" id="invoicesDiv"></div>
+        <div id="loadingInvoicesWheel" class="loader"></div><br>
       </section>
     </div>
   </div>
@@ -387,15 +391,11 @@
   <script>
     if (sessionStorage.userSession !== null) {
       myProfile();
+    } else if (navigator.userAgent.toLowerCase().indexOf("pibrowser") < 0 && localStorage.signed == "true") {
+      const sessionTkn = localStorage.userSession;
+      sessionStorage.userSession = sessionTkn;
+      myProfile();
     }
-    if (navigator.userAgent.toLowerCase().indexOf("pibrowser") >= 0) {
-      document.getElementById("piBrowser").style.display = "none";
-      
-    } else if (localStorage.password) {
-      const password = localStorage.password;
-      const username = localStorage.username;
-      appLogin(username, password);
-    } 
     if (navigator.userAgent.toLowerCase().indexOf("pibrowser") < 0) {
       const div = document.getElementById("navDiv");
       const a = document.createElement("a");
@@ -403,6 +403,7 @@
       a.classList.add("fa");
       a.classList.add("tab");
       a.classList.add("fa-key");
+      a.setAttribute('id', 'appLoginBtn');
       a.setAttribute('onclick', 'openLoginModal()')
       i.style.font = "normal italic 15px Fredoka, sans-serif";
       i.style.margin = "0px 0px 0px 0px";
@@ -414,6 +415,7 @@
       _a.classList.add("fa");
       _a.classList.add("tab");
       _a.innerHTML = `&#8508;`;
+      _a.style.transform = "translateX(3px)";
       _a.setAttribute('onclick', 'openBrowser()')
       _i.style.font = "normal italic 15px Fredoka, sans-serif";
       _i.style.margin = "0px 0px 0px 8px";
@@ -430,8 +432,8 @@
       a.setAttribute('onclick', 'addPassword()')
       i.style.font = "normal italic 15px Fredoka, sans-serif";
       i.style.margin = "0px 0px 0px 0px";
-      if (!localStorage.password) i.textContent = "Enable password login";
-      else i.textContent = "Change password";
+      i.textContent = "Enable password login";
+      i.setAttribute('id', 'setPasswordLabel');
       a.appendChild(i);
       div.appendChild(a);
     } 

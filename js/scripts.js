@@ -239,6 +239,7 @@ function closeInvoices() {
   const tint = document.getElementById("darkTint");
   tint.style.display = "none";
   document.getElementById("invoicesDiv").innerHTML = "";
+  document.getElementById("loadingInvoicesWheel").style.display = "block";
 }
 
 function closeReferralModal() {

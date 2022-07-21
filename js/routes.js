@@ -31,51 +31,55 @@ async function piLogin() {
   try {
     const queryString = window.location.search;
     const urlParams = new URLSearchParams(queryString);
-    const referrer = urlParams.get('r');
+    const referrer = urlParams.get("r");
     if (referrer) {
-      const config = { username: localStorage.username, uid: localStorage.uid, referral: referrer };
+      const config = {
+        username: localStorage.username,
+        uid: localStorage.uid,
+        referral: referrer
+      };
       const response = await axios.post(`${urlAPI}/register/referred`, config);
       if (response.status === 200 || response.status === 201) {
-      const token = response.data.token;
-      sessionStorage.removeItem("userSession");
-      localStorage.removeItem("userSession");
-      sessionStorage.setItem("userSession", token);
-      localStorage.setItem("userSession", token);
-      // show logged in
-      authNavv.forEach((elem) => {
-        elem.classList.remove("authNav");
-        elem.classList.add("showNav");
-      });
-      unAuthNavv.forEach((elem) => {
-        elem.classList.remove(elem);
-      });
-      myProfile();
-    }
-    if (response.status === 201) {
-      alert("Welcome to Pi eCard!");
-    }
+        const token = response.data.token;
+        sessionStorage.removeItem("userSession");
+        localStorage.removeItem("userSession");
+        sessionStorage.setItem("userSession", token);
+        localStorage.setItem("userSession", token);
+        // show logged in
+        authNavv.forEach((elem) => {
+          elem.classList.remove("authNav");
+          elem.classList.add("showNav");
+        });
+        unAuthNavv.forEach((elem) => {
+          elem.classList.remove(elem);
+        });
+        myProfile();
+      }
+      if (response.status === 201) {
+        alert("Welcome to Pi eCard!");
+      }
     } else {
       const config = { username: localStorage.username, uid: localStorage.uid };
       const response = await axios.post(`${urlAPI}/register/`, config);
       if (response.status === 200 || response.status === 201) {
-      const token = response.data.token;
-      sessionStorage.removeItem("userSession");
-      localStorage.removeItem("userSession");
-      sessionStorage.setItem("userSession", token);
-      localStorage.setItem("userSession", token);
-      // show logged in
-      authNavv.forEach((elem) => {
-        elem.classList.remove("authNav");
-        elem.classList.add("showNav");
-      });
-      unAuthNavv.forEach((elem) => {
-        elem.classList.remove(elem);
-      });
-      myProfile();
-    }
-    if (response.status === 201) {
-      alert("Welcome to Pi eCard!");
-    }
+        const token = response.data.token;
+        sessionStorage.removeItem("userSession");
+        localStorage.removeItem("userSession");
+        sessionStorage.setItem("userSession", token);
+        localStorage.setItem("userSession", token);
+        // show logged in
+        authNavv.forEach((elem) => {
+          elem.classList.remove("authNav");
+          elem.classList.add("showNav");
+        });
+        unAuthNavv.forEach((elem) => {
+          elem.classList.remove(elem);
+        });
+        myProfile();
+      }
+      if (response.status === 201) {
+        alert("Welcome to Pi eCard!");
+      }
     }
   } catch (error) {
     console.log(error);
@@ -85,10 +89,7 @@ async function piLogin() {
 async function appLogin(username, password) {
   try {
     const config = { username: username, password: password };
-    const response = await axios.post(
-      `${urlAPI}/register/app`,
-      config
-    );
+    const response = await axios.post(`${urlAPI}/register/app`, config);
     if (response.status === 200) {
       const token = response.data.token;
       sessionStorage.removeItem("userSession");
@@ -96,7 +97,7 @@ async function appLogin(username, password) {
       sessionStorage.setItem("userSession", token);
       localStorage.setItem("userSession", token);
       localStorage.setItem("username", username);
-      localStorage.setItem("password", password);
+      localStorage.signed = "true";
       // show logged in
       authNavv.forEach((elem) => {
         elem.classList.remove("authNav");
@@ -133,15 +134,28 @@ async function myProfile() {
   const elem = document.createElement("i");
   const elemTwo = document.createElement("i");
   const authToken = localStorage.getItem("userSession");
-
   try {
-    const response = await axios.get(`${urlAPI}/register`, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${authToken}`
-      }
-    });
-    if (response.status === 200 || 304) {
+    const response = await axios
+      .get(`${urlAPI}/register`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`
+        }
+      })
+      .catch((error) => {
+        localStorage.signed == "false";
+        balance.textContent = `0`;
+        elem.textContent = `pi`;
+        balanceTwo.textContent = `0`;
+        elemTwo.textContent = `pi`;
+        balance.appendChild(elem);
+        balanceTwo.appendChild(elemTwo);
+        username.textContent = `please login`;
+        name.textContent = `please login`;
+        document.getElementById("historySection").textContent =
+          "please login to see your transactions";
+      });
+    if (response.status === 200) {
       balance.textContent = `${response.data.user.balance.toFixed(2)}`;
       elem.textContent = `pi`;
       balanceTwo.textContent = response.data.user.balance.toFixed(2);
@@ -153,6 +167,8 @@ async function myProfile() {
       const history = response.data.user.history;
       localStorage.balance = response.data.user.balance;
       shortHistory(history);
+      if (navigator.userAgent.toLowerCase().indexOf("pibrowser") < 0) document.getElementById("appLoginBtn").style.display = "none";
+      if (response.data.user.password && navigator.userAgent.toLowerCase().indexOf("pibrowser") >= 0) document.getElementById("setPasswordLabel").textContent = "Change password";
     }
   } catch (error) {
     const errorMessage = error.response.data.message;
@@ -182,6 +198,9 @@ async function logout() {
         document.getElementById("historySection").textContent = "";
         document.getElementById("username").textContent = "Please login";
         document.getElementById("balance").textContent = "0";
+        sessionStorage.removeItem("userSession");
+        localStorage.removeItem("userSession");
+        localStorage.signed = "false";
       }
     }
   } catch (error) {
@@ -233,7 +252,9 @@ async function displayHistory() {
 async function shortHistory(history) {
   document.getElementById("historySection").textContent = "";
   historySection.textContent = "";
-  if (history == "") historySection.textContent = "your transactions will appear here...";
+  document.getElementById("loadingHistoryWheel").style.display = "none";
+  if (history == "")
+    historySection.textContent = "your transactions will appear here...";
   for (const transaction of history) {
     const renderDiv = document.createElement("article");
     const renderAmount = document.createElement("h");
@@ -322,6 +343,7 @@ function makePaymentByUsername() {
     document.getElementById(
       "confirmPaymentUsernameMessage"
     ).textContent = `Pay ${amount}Pi to ${payee}?`;
+    document.getElementById("confirmPaymentUsernameMessageFee").textContent = `+ ${amount*0.01} Pi transaction fee`;
   } else alert("Please fill in all the fields marked with *");
 }
 
@@ -452,9 +474,9 @@ function openBrowser() {
 }
 
 async function getInvoices() {
-  const response = await instance.get('/payment', {
+  const response = await instance.get("/payment", {
     params: {
-      username: localStorage.username,
+      username: localStorage.username
     }
   });
   console.log(response);
@@ -467,6 +489,7 @@ async function getInvoices() {
 function renderInvoices(invoices) {
   try {
     const invoicesDiv = document.getElementById("invoicesDiv");
+    document.getElementById("loadingInvoicesWheel").style.display = "none";
     for (const invoice of invoices) {
       const div = document.createElement("article");
       const renderTitle = document.createElement("h4");
@@ -481,8 +504,10 @@ function renderInvoices(invoices) {
       renderMemo.className = "renderedInvoiceMemo";
       renderDate.className = "renderedInvoiceDate";
       renderStatus.className = "renderedInvoiceStatus";
-      if (invoice.payer == null || invoice.payer == "") renderTitle.textContent = `Request ${invoice.amount} Pi`;
-      else renderTitle.textContent = `Requested ${invoice.amount} Pi from ${invoice.payer}`;
+      if (invoice.payer == null || invoice.payer == "")
+        renderTitle.textContent = `Request ${invoice.amount} Pi`;
+      else
+        renderTitle.textContent = `Requested ${invoice.amount} Pi from ${invoice.payer}`;
       renderMemo.textContent = "Memo: " + invoice.memo;
       renderDate.textContent = invoice.date.substring(0, 10);
       if (invoice.status == true) {
@@ -497,7 +522,7 @@ function renderInvoices(invoices) {
         const response = await instance.delete(`/payment?id=${invoice._id}`);
         if (response.status == 200) div.style.display = "none";
         else alert("Failed to delete. Please try again later...");
-      }
+      };
       infoDiv.appendChild(renderDate);
       infoDiv.appendChild(renderStatus);
       infoDiv.appendChild(renderButton);
@@ -513,18 +538,21 @@ function renderInvoices(invoices) {
 
 async function addPassword() {
   if (sessionStorage.userSession) {
-    const password = prompt("Please create a password to login outside the Pi Browser:", "");
-    const config = { username: localStorage.username, uid: localStorage.uid, password: password };
-    const response = await axios.post(
-      `${urlAPI}/register/manual`,
-      config,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`
-        }
-      }
+    const password = prompt(
+      "Please create a password to login outside the Pi Browser:",
+      ""
     );
+    const config = {
+      username: localStorage.username,
+      uid: localStorage.uid,
+      password: password
+    };
+    const response = await axios.post(`${urlAPI}/register/manual`, config, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`
+      }
+    });
     if (response.status == 200 || response.status == 201) {
       localStorage.password = "true";
       flashMessage = `Success! You can now login to our mobile or desktop app.`;
@@ -532,7 +560,7 @@ async function addPassword() {
       flashMessage = response.data.message;
     }
   } else openBrowser();
-  
+
   flashBool = true;
   if (flashBool && flashMessage.length > 0) {
     pTag.textContent = flashMessage;
@@ -543,4 +571,12 @@ async function addPassword() {
       errorFlash.removeChild(pTag);
     }, flashTime);
   }
+}
+
+
+////////////////// dev
+function force() {
+  localStorage.username = "pioneer";
+  localStorage.uid = "111";
+  piLogin();
 }
